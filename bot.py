@@ -2,6 +2,26 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import time
 import random
+import os
+import threading
+from flask import Flask
+
+# --- إعداد خادم الويب لإبقاء البوت مستيقظاً على Render ---
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Ruzba Bot is active 24/7! 🚀"
+
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    t = threading.Thread(target=run_web)
+    t.daemon = True
+    t.start()
+# -----------------------------------------------------
 
 TOKEN = "9235998382:AAEG9EUpI9jMn9qewA-i3Ft1Hne5YrkF9Ms"
 CREATOR_ID = 5742138769  # رقم الـ ID الخاص بك
@@ -186,6 +206,9 @@ def security_and_chat_handler(message):
         return
 
 if __name__ == '__main__':
+    print("🤖 Starting Web Server for 24/7 uptime...")
+    keep_alive()  # تشغيل خادم الويب في الخلفية
+    
     print("🤖 Ruzba Bot is running...")
     while True:
         try:
@@ -193,4 +216,3 @@ if __name__ == '__main__':
         except Exception as e:
             print(f"Connection error: {e}")
             time.sleep(5)
-
